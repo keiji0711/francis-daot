@@ -1,0 +1,101 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="max-w-9xl mx-auto p-8">
+    <!-- Appointments Header Section -->
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-bold text-gray-800">Appointments</h1>
+        <p class="mt-4 text-lg text-gray-600">Manage and track all blood donation appointments.</p>
+    </div>
+
+    <!-- Appointments Table Section -->
+    <div class="bg-white p-8 rounded-lg shadow-lg">
+        <div class="flex justify-between items-center mb-6">
+            <div class="w-full md:w-1/2">
+                <!-- Search Bar -->
+                <input type="text" placeholder="Search Appointments..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600" />
+            </div>
+            <!-- Add Appointment Button inside the card -->
+            <button onclick="openModal()" class="bg-red-600 text-white px-6 py-3 rounded-md shadow-md hover:bg-red-700">
+                Add Appointment
+            </button>
+        </div>
+
+        <table class="min-w-full table-auto border-collapse">
+            <thead>
+                <tr>
+                    <th class="border px-8 py-4 text-left">Donor Name</th>
+                    <th class="border px-8 py-4 text-left">Appointment Date</th>
+                    <th class="border px-8 py-4 text-left">Blood Type</th>
+                    <th class="border px-8 py-4 text-left">Location</th>
+                    <th class="border px-8 py-4 text-left">Purpose of Appointment</th>
+                    <th class="border px-8 py-4 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Example Appointment Row -->
+                <tr class="hover:bg-gray-100">
+                    <td class="border px-8 py-4">John Doe</td>
+                    <td class="border px-8 py-4">2025-04-10 10:00 AM</td>
+                    <td class="border px-8 py-4">O+</td>
+                    <td class="border px-8 py-4">Hospital A, Room 101</td>
+                    <td class="border px-8 py-4">Blood Donation</td>
+                    <td class="border px-8 py-4 space-x-4">
+                        <a href="/appointments/edit/1" class="text-blue-600 hover:text-blue-800">Edit</a>
+                        <a href="/appointments/delete/1" class="text-red-600 hover:text-red-800">Delete</a>
+                    </td>
+                </tr>
+                <!-- Add more appointment rows dynamically here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal for Adding Appointment -->
+<div id="appointmentModal" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center hidden">
+    <div class="bg-white rounded-lg p-8 w-full max-w-lg">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-red-600">Add Appointment</h2>
+            <button onclick="closeModal()" class="text-gray-600 hover:text-red-600">&times;</button>
+        </div>
+        <form class="mt-6">
+            <div class="mb-4">
+                <label for="donorName" class="block text-sm font-medium text-gray-700">Donor Name</label>
+                <input type="text" id="donorName" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+            </div>
+            <div class="mb-4">
+                <label for="appointmentDate" class="block text-sm font-medium text-gray-700">Appointment Date</label>
+                <input type="datetime-local" id="appointmentDate" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+            </div>
+            <div class="mb-4">
+                <label for="bloodType" class="block text-sm font-medium text-gray-700">Blood Type</label>
+                <input type="text" id="bloodType" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+            </div>
+            <div class="mb-4">
+                <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
+                <input type="text" id="location" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+            </div>
+            <div class="mb-4">
+                <label for="purpose" class="block text-sm font-medium text-gray-700">Purpose of Appointment</label>
+                <input type="text" id="purpose" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-md shadow-md hover:bg-red-700">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Open Modal
+    function openModal() {
+        document.getElementById('appointmentModal').classList.remove('hidden');
+    }
+
+    // Close Modal
+    function closeModal() {
+        document.getElementById('appointmentModal').classList.add('hidden');
+    }
+</script>
+
+{% endblock %}

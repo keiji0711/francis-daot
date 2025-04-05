@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Donation System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    
+    <!-- Inside the <head> -->
+<style>
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+</style>
+
+</head>
+<body class="bg-gray-50 font-sans flex">
+
+    <!-- Side Navigation Bar -->
+    <div class="w-64 h-screen bg-red-700 text-white p-6">
+        <div class="text-2xl font-bold mb-8">Blood Donation</div>
+        <div class="space-y-6">
+            <a href="{{url_for('main.dashboard')}}" class="block hover:bg-red-800 p-3 rounded-lg">Dashboard</a>
+            <a href="{{url_for('main.registered_donors')}}" class="block hover:bg-red-800 p-3 rounded-lg">Registered Donor</a>
+            <a href="{{url_for('main.appointments')}}" class="block hover:bg-red-800 p-3 rounded-lg">Appointments</a>
+            <a href="{{url_for('main.inventory')}}" class="block hover:bg-red-800 p-3 rounded-lg">Inventory</a>
+            <a href="{{url_for('main.blood_req_transactions')}}" class="block hover:bg-red-800 p-3 rounded-lg">Request Transaction</a> <!-- Added Blood Requests -->
+            <a href="{{url_for('main.account_management')}}" class="block hover:bg-red-800 p-3 rounded-lg">Account management</a> 
+        </div>
+    </div>
+
+    <!-- Main Content Section -->
+    <div class="flex-1 p-8">
+        <!-- Top Navigation Bar -->
+        <nav class="bg-red-700 text-white shadow-lg p-4 mb-6 rounded-lg flex justify-between items-center">
+            <div class="text-2xl font-bold">Welcome to the Blood Donation System</div>
+            <div class="flex items-center space-x-4">
+                <div class="text-sm">Hello, Admin</div>
+                <a href="/profile" class="text-white hover:text-gray-200">Profile</a>
+                <a href="/logout" class="text-white hover:text-gray-200">Logout</a>
+            </div>
+        </nav>
+
+        <!-- Main Content Block -->
+        {% block content %}
+        <!-- Default content will go here if no specific content is provided in child templates -->
+        {% endblock %}
+    </div>
+
+</body>
+</html>

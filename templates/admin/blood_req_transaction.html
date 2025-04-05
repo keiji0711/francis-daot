@@ -1,0 +1,112 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto p-6">
+    <div class="bg-white rounded-2xl shadow-xl p-8 space-y-6 border border-gray-200">
+        <!-- Header -->
+        <div class="text-center">
+            <h1 class="text-4xl font-bold text-red-700">🩸 Blood Requests</h1>
+            <p class="text-gray-600 mt-2">Manage and assign donors to incoming blood requests.</p>
+        </div>
+
+        <!-- Cards for each request -->
+        <div x-data="{ active: null }" class="space-y-6">
+            {% for request in [
+                {
+                    'type': 'person',
+                    'name': 'John Smith',
+                    'blood_type': 'O+',
+                    'quantity': 3,
+                    'status': 'Pending',
+                    'details': 'Urgent surgery at 4PM.',
+                    'date': 'April 5, 2025'
+                },
+                {
+                    'type': 'hospital',
+                    'name': "St. Mary's Hospital",
+                    'blood_type': 'A-',
+                    'quantity': 5,
+                    'status': 'Fulfilled',
+                    'details': 'Scheduled delivery.',
+                    'date': 'April 3, 2025'
+                }
+            ] %}
+            <div class="border rounded-xl shadow-lg bg-white overflow-hidden transition-all">
+                <!-- Card Header -->
+                <button 
+                    @click="active === {{ loop.index }} ? active = null : active = {{ loop.index }}" 
+                    class="w-full flex items-center justify-between p-5 hover:bg-gray-100 transition duration-300">
+
+                    <div class="flex items-center space-x-3">
+                        <div class="text-red-600 text-2xl">
+                            {% if request.type == 'hospital' %} 🏥 {% else %} 🧍 {% endif %}
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800">{{ request.name }}</h3>
+                            <p class="text-sm text-gray-500">Needs {{ request.quantity }} units • Blood Type: <span class="font-bold">{{ request.blood_type }}</span></p>
+                        </div>
+                    </div>
+
+                    <div class="text-sm font-medium text-white px-3 py-1 rounded-full
+                                {% if request.status == 'Pending' %}
+                                    bg-yellow-500
+                                {% elif request.status == 'Fulfilled' %}
+                                    bg-green-500
+                                {% else %}
+                                    bg-gray-400
+                                {% endif %}">
+                        {{ request.status }}
+                    </div>
+                </button>
+
+                <!-- Card Body (Accordion) -->
+                <div x-show="active === {{ loop.index }}" x-collapse>
+                    <div class="px-6 pb-5 pt-2 text-sm text-gray-700 border-t bg-white">
+                        <p class="mt-3">📝 <strong>Details:</strong> {{ request.details }}</p>
+                        <p class="mt-2">📅 <strong>Date:</strong> {{ request.date }}</p>
+
+                        <div class="mt-4 flex justify-end space-x-3">
+                            <button onclick="openAssignDonorModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                                Assign Donor
+                            </button>
+                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md" @click="active = null">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Assigning Donor -->
+<div id="assignDonorModal" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center hidden z-50">
+    <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-2xl border border-gray-200">
+        <h2 class="text-2xl font-bold text-center text-red-600">Assign Donor to Request</h2>
+        <form action="#" method="POST" class="mt-6">
+            <label for="donor-name" class="block text-sm font-medium text-gray-700">Select Donor</label>
+            <select id="donor-name" name="donor_name" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+                <option value="donor1">Donor 1</option>
+                <option value="donor2">Donor 2</option>
+                <option value="donor3">Donor 3</option>
+            </select>
+
+            <button type="submit" class="mt-6 bg-red-600 text-white p-2 w-full rounded-md hover:bg-red-700">Assign Donor</button>
+        </form>
+        <button onclick="closeAssignDonorModal()" class="mt-4 w-full text-center text-red-600 font-medium">Cancel</button>
+    </div>
+</div>
+
+<script>
+    function openAssignDonorModal() {
+        document.getElementById('assignDonorModal').classList.remove('hidden');
+    }
+    function closeAssignDonorModal() {
+        document.getElementById('assignDonorModal').classList.add('hidden');
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+{% endblock %}

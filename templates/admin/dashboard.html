@@ -1,0 +1,67 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-10 px-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-">
+            <h1 class="text-4xl font-extrabold text-gray-800 b">Admin Dashboard</h1>
+            <p class="mt-2 text-gray-600 text-lg">Welcome back! Manage the entire Blood Donation System below.</p>
+        </div>
+
+        <!-- Main Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
+            <!-- existing 3 cards here... -->
+        </div>
+
+        <!-- Outer Card -->
+        <div class="bg-white shadow-lg rounded-2xl p-8 space-y-10 -mt-10"> <!-- added -mt-4 for margin-top adjustment -->
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-50 shadow-sm rounded-lg p-6">
+                    <p class="text-gray-500">Total Donors</p>
+                    <p class="text-3xl font-bold text-red-600">324</p>
+                </div>
+                <div class="bg-gray-50 shadow-sm rounded-lg p-6">
+                    <p class="text-gray-500">Blood Units Available</p>
+                    <p class="text-3xl font-bold text-green-600">89</p>
+                </div>
+                <div class="bg-gray-50 shadow-sm rounded-lg p-6">
+                    <p class="text-gray-500">Requests Fulfilled</p>
+                    <p class="text-3xl font-bold text-blue-600">112</p>
+                </div>
+            </div>
+        
+            <!-- Quick Actions -->
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Quick Actions</h2>
+                <div class="flex flex-wrap gap-4">
+                    <a href="/add-donor" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">➕ Add Donor</a>
+                    <a href="/create-drive" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">📅 Schedule Blood Drive</a>
+                    <a href="/inventory/add" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">📦 Update Inventory</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- New Card for Recent Activity -->
+        <div class="bg-white shadow-lg rounded-2xl p-8 mt-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Recent Activity</h2>
+            <ul class="divide-y divide-gray-200">
+                <li class="py-3">
+                    <p class="text-gray-700">✅ New donor registered: <strong>Maria Lopez</strong></p>
+                    <p class="text-sm text-gray-400">2 hours ago</p>
+                </li>
+                <li class="py-3">
+                    <p class="text-gray-700">🩸 Blood request approved for <strong>John D.</strong></p>
+                    <p class="text-sm text-gray-400">4 hours ago</p>
+                </li>
+                <li class="py-3">
+                    <p class="text-gray-700">📦 Inventory updated (O+ added)</p>
+                    <p class="text-sm text-gray-400">1 day ago</p>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

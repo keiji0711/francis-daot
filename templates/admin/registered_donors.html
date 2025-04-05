@@ -1,0 +1,120 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="max-w-9xl mx-auto p-8" x-data="{ showModal: false }">
+    <!-- Registered Donors Header Section -->
+    <div class="text-center mb-6">
+        <h1 class="text-4xl font-bold text-gray-800">Registered Donors</h1>
+        <p class="mt-4 text-lg text-gray-600">A list of all registered blood donors.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div x-data="{ show: true }" x-show="show" x-transition class="fixed inset-0 flex items-center justify-center z-50">
+                {% for category, message in messages %}
+                    <div class="relative w-96 bg-white shadow-2xl rounded-xl px-8 py-6 border-4 text-center
+                        {% if category == 'success' %}
+                            border-green-500
+                        {% elif category == 'danger' %}
+                            border-red-500
+                        {% else %}
+                            border-gray-500
+                        {% endif %}
+                    ">
+                        <button @click="show = false" class="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl leading-none">&times;</button>
+                        <p class="text-xl font-semibold text-gray-800">{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Card for Donors Section -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-4 border border-gray-200 overflow-y-auto" style="position: absolute; height:70%; width: 80%;">
+        <div class="flex justify-between items-center mb-4">
+            <div class="w-full md:w-1/2">
+                <!-- Search Bar -->
+                <input type="text" placeholder="Search Donors..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600" />
+            </div>
+            <!-- Add Donor Button -->
+            <button onclick="openAddDonorModal()" class="bg-red-600 text-white px-6 py-3 rounded-md shadow-md hover:bg-red-700">
+                Add Donor
+            </button>
+        </div>
+
+        <!-- Donors List Section (Scrollable) -->
+        <div class="max-h-[500px] overflow-y-auto space-y-6">
+            {% for i in donors %}
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-md hover:bg-gray-100">
+                <div class="flex items-center space-x-6">
+                    <!-- Profile Image -->
+                    <img src="https://i.pinimg.com/736x/44/93/f3/4493f30f04ea1881d3df9956bf62f91a.jpg" class="w-16 h-16 rounded-full object-cover">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800">{{ i[1] }}</h3>
+                        <p class="text-sm text-gray-600">Age: {{ i[2] }} | Blood Type: {{ i[3] }}</p>
+                    </div>
+                </div>
+
+                <div class="flex space-x-6">
+                    <p class="text-sm text-gray-600">Address: {{ i[4] }}</p>
+                    <p class="text-sm text-gray-600">Contact: {{ i[5] }}</p>
+                </div>
+
+                <div class="flex space-x-4 mt-4">
+                    <a href="/donor/edit/{{ i[0] }}" class="text-blue-600 hover:text-blue-800">Edit</a>
+                    <a href="/donor/delete/{{ i[0] }}" class="text-red-600 hover:text-red-800">Delete</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Adding Donor -->
+<div id="addDonorModal" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center hidden">
+    <div class="bg-white rounded-lg p-8 w-11/12 sm:w-1/3">
+        <h2 class="text-2xl font-bold text-center text-red-600">Add New Donor</h2>
+        <form action="{{ url_for('main.registered_donors')}}" method="POST" class="mt-6">
+            <label for="donor-name" class="block text-sm font-medium text-gray-700">Donor Name</label>
+            <input type="text" id="donor-name" name="name" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+
+            <label for="donor-age" class="block text-sm font-medium text-gray-700 mt-4">Age</label>
+            <input type="number" id="donor-age" name="age" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+
+            <label for="donor-blood-type" class="block text-sm font-medium text-gray-700 mt-4">Blood Type</label>
+            <select name="blood_type" required class="w-full p-2 border rounded-md">
+                <option value="1">A+</option>
+                <option value="2">A-</option>
+                <option value="3">B+</option>
+                <option value="4">B-</option>
+                <option value="5">AB+</option>
+                <option value="6">AB-</option>
+                <option value="7">O+</option>
+                <option value="8">O-</option>
+            </select>
+
+            <label for="donor-address" class="block text-sm font-medium text-gray-700 mt-4">Address</label>
+            <input type="text" id="donor-address" name="address" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+
+            <label for="donor-contact" class="block text-sm font-medium text-gray-700 mt-4">Contact</label>
+            <input type="text" id="donor-contact" name="Contact" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+
+            <button type="submit" class="mt-6 bg-red-600 text-white p-2 w-full rounded-md hover:bg-red-700">Add Donor</button>
+        </form>
+        <button onclick="closeAddDonorModal()" class="mt-4 w-full text-center text-red-600 font-medium">Cancel</button>
+    </div>
+</div>
+
+<script>
+    // Function to open the "Add Donor" modal
+    function openAddDonorModal() {
+        document.getElementById('addDonorModal').classList.remove('hidden'); // Remove hidden class to show the modal
+    }
+
+    // Function to close the "Add Donor" modal
+    function closeAddDonorModal() {
+        document.getElementById('addDonorModal').classList.add('hidden'); // Add hidden class to hide the modal
+    }
+</script>
+
+{% endblock %}
