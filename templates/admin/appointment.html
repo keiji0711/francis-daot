@@ -8,6 +8,27 @@
         <p class="mt-4 text-lg text-gray-600">Manage and track all blood donation appointments.</p>
     </div>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div x-data="{ show: true }" x-show="show" x-transition class="fixed inset-0 flex items-center justify-center z-50">
+                {% for category, message in messages %}
+                    <div class="relative w-96 bg-white shadow-2xl rounded-xl px-8 py-6 border-4 text-center
+                        {% if category == 'success' %}
+                            border-green-500
+                        {% elif category == 'danger' %}
+                            border-red-500
+                        {% else %}
+                            border-gray-500
+                        {% endif %}
+                    ">
+                        <button @click="show = false" class="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl leading-none">&times;</button>
+                        <p class="text-xl font-semibold text-gray-800">{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
     <!-- Appointments Table Section -->
     <div class="bg-white p-8 rounded-lg shadow-lg">
         <div class="flex justify-between items-center mb-6">
@@ -33,18 +54,24 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Example Appointment Row -->
+                {% for i in appointments %}
                 <tr class="hover:bg-gray-100">
-                    <td class="border px-8 py-4">John Doe</td>
-                    <td class="border px-8 py-4">2025-04-10 10:00 AM</td>
-                    <td class="border px-8 py-4">O+</td>
-                    <td class="border px-8 py-4">Hospital A, Room 101</td>
-                    <td class="border px-8 py-4">Blood Donation</td>
+                    <td class="border px-8 py-4">{{ i[1] }}</td>
+                    <td class="border px-8 py-4">{{ i[2] }}</td>
+                    <td class="border px-8 py-4">{{ i[3] }}</td>
+                    <td class="border px-8 py-4">{{ i[4] }}</td>
+                    <td class="border px-8 py-4">{{ i[5] }}</td>
                     <td class="border px-8 py-4 space-x-4">
-                        <a href="/appointments/edit/1" class="text-blue-600 hover:text-blue-800">Edit</a>
-                        <a href="/appointments/delete/1" class="text-red-600 hover:text-red-800">Delete</a>
+                        <button type="submit" class="text-blue-600 hover:text-blue-800">Edit</button>
+                        <form action="{{ url_for('deletee.delete_appointment', appointment_id=i[0]) }}" method="POST" style="display:inline;"> 
+                            <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
+                        </form>
+                        <form action="{{ url_for('update.update_app_status', appointment_id=i[0]) }}" method="POST" style="display:inline;"> 
+                        <button type="submit" class="text-green-600 hover:text-green-800">Success</button>
+                        </form>
                     </td>
                 </tr>
+                {% endfor %}
                 <!-- Add more appointment rows dynamically here -->
             </tbody>
         </table>
@@ -58,26 +85,34 @@
             <h2 class="text-2xl font-bold text-red-600">Add Appointment</h2>
             <button onclick="closeModal()" class="text-gray-600 hover:text-red-600">&times;</button>
         </div>
-        <form class="mt-6">
+        <form class="mt-6" action="{{url_for('adding.add_appointment')}}" method="POST">
             <div class="mb-4">
                 <label for="donorName" class="block text-sm font-medium text-gray-700">Donor Name</label>
-                <input type="text" id="donorName" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+                <select name="donor_name" required class="w-full p-2 border rounded-md">
+                    {% for donor in donors %}
+                    <option value="{{ donor[0] }}">{{ donor[1] }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="mb-4">
                 <label for="appointmentDate" class="block text-sm font-medium text-gray-700">Appointment Date</label>
-                <input type="datetime-local" id="appointmentDate" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+                <input type="datetime-local" name="appointmentDate" id="appointmentDate" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
             </div>
             <div class="mb-4">
-                <label for="bloodType" class="block text-sm font-medium text-gray-700">Blood Type</label>
-                <input type="text" id="bloodType" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+                <label for="donor-blood-type" class="block text-sm font-medium text-gray-700 mt-4">Blood Type</label>
+            <select name="blood_type" required class="w-full p-2 border rounded-md">
+                {% for i in blood_type %}
+                <option value="{{ i[0]}} ">{{ i[1] }}</option>
+                {% endfor %}
+            </select>
             </div>
             <div class="mb-4">
                 <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
-                <input type="text" id="location" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+                <input type="text" name="location" id="location" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
             </div>
             <div class="mb-4">
                 <label for="purpose" class="block text-sm font-medium text-gray-700">Purpose of Appointment</label>
-                <input type="text" id="purpose" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+                <input type="text" name="purpose" id="purpose" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
             </div>
             <div class="flex justify-end">
                 <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-md shadow-md hover:bg-red-700">Save</button>
