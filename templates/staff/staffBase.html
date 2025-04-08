@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Blood Request System{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+
+  <style>
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+</style>
+</head>
+<body class="bg-gray-50">
+
+  <!-- Header Section -->
+  <header class="bg-red-700 text-white p-4">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">Blood Request System</h1>
+      <ul class="flex items-center space-x-6 ml-auto">
+        <li class="text-white">Welcome, <span id="username">{{ username or "User" }}</span></li>
+        <li><a href="/login" class="text-white hover:text-gray-300">Logout</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 min-h-screen p-6 hidden md:block">
+      <h2 class="text-xl font-bold text-red-600 mb-6">🩸 Menu</h2>
+      <nav class="space-y-4">
+        <a href="/" class="block text-gray-700 hover:text-red-600 font-medium">🏠 Dashboard</a>
+        <a href="/request" class="block text-gray-700 hover:text-red-600 font-medium">📝 Set Request</a>
+        <a href="/completed" class="block text-gray-700 hover:text-red-600 font-medium">✅ Completed Request</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8">
+      {% block content %}
+      <!-- Page-specific content goes here -->
+      {% endblock %}
+    </main>
+  </div>
+
+  <!-- Optional Script Area -->
+  {% block scripts %}
+  <script>
+    // Example: Update username from server-side variable
+    document.getElementById('username').textContent = "{{ username or 'Admin' }}";
+  </script>
+  {% endblock %}
+
+</body>
+</html>
