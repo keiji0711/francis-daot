@@ -46,7 +46,7 @@ def registered_donors():
         cursor = conn.cursor()
         cursor.execute("""SELECT donors.donor_id, donors.donor_name, donors.donor_age,blood_type.blood_type_name,donors.address,
                        donors.contact,donors.status FROM donors,blood_type
-            WHERE donors.blood_type_id = blood_type.blood_type_id""")
+            WHERE donors.blood_type_id = blood_type.blood_type_id """)
         donors = cursor.fetchall()
     finally:
         if conn.is_connected():
@@ -62,7 +62,20 @@ def inventory():
 
 @bp.route('/appointments')
 def appointments():
-    return render_template('admin/appointment.html')
+    conn = mysql.connector.connect(**db)
+    cursor = conn.cursor()
+
+    cursor.execute("select * from donors")
+    donors = cursor.fetchall()
+
+    cursor.execute('select * from blood_type')
+    blood_type = cursor.fetchall()
+
+    cursor.execute("""SELECT appointment.appointment_id, donors.donor_name,appointment.date, blood_type.blood_type_name,appointment.location,appointment.purpose ,appointment.status
+FROM appointment,donors, blood_type WHERE appointment.donor_id = donors.donor_id AND appointment.blood_type_id = blood_type.blood_type_id and appointment.status = 'Active' """)
+    appointments = cursor.fetchall()
+    return render_template('admin/appointment.html', donors = donors, blood_type = blood_type, appointments = appointments)
+
 
 @bp.route('/blood_requests')
 def blood_requests():
@@ -114,7 +127,7 @@ def account_management():
     try:
         conn = mysql.connector.connect(**db)
         cursor = conn.cursor()
-        cursor.execute("""SELECT user.username, type_of_user.user_type, user.password FROM user,
+        cursor.execute("""SELECT user.username, type_of_user.user_type, user.password, user.user_id FROM user,
                        type_of_user WHERE user.type_of_user_id = type_of_user.type_of_user_id""")
         users = cursor.fetchall()
     finally:
@@ -123,3 +136,24 @@ def account_management():
             conn.close()
 
     return render_template('admin/account_management.html', users = users)
+
+@bp.route('/app_history')
+def app_history():
+    conn = mysql.connector.connect(**db)
+    cursor = conn.cursor()
+
+    cursor.execute("""SELECT 
+    appointment.appointment_id, 
+    donors.donor_name,
+    appointment.date, 
+    blood_type.blood_type_name, 
+    appointment.location, 
+    appointment.purpose,
+    appointment.status
+FROM appointment
+JOIN donors ON appointment.donor_id = donors.donor_id
+JOIN blood_type ON appointment.blood_type_id = blood_type.blood_type_id
+WHERE appointment.status != 'Active';
+ """)
+    app_history = cursor.fetchall()
+    return render_template('admin/appointment_history.html', app_history = app_history)
