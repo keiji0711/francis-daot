@@ -16,9 +16,7 @@
                 <input type="text" placeholder="Search Inventory..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600" />
             </div>
             <!-- Add Inventory Button inside the card -->
-            <button onclick="openModal()" class="bg-red-600 text-white px-6 py-3 rounded-md shadow-md hover:bg-red-700">
-                Add Inventory
-            </button>
+            
         </div>
 
         <table class="min-w-full table-auto border-collapse">
@@ -27,29 +25,17 @@
                     <th class="border px-8 py-4 text-left">Blood Type</th>
                     <th class="border px-8 py-4 text-left">Available Quantity</th>
                     <th class="border px-8 py-4 text-left">Last Updated</th>
-                    <th class="border px-8 py-4 text-left">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Example Inventory Row -->
+                {% for i in inventory %}
                 <tr class="hover:bg-gray-100">
-                    <td class="border px-8 py-4">O+</td>
-                    <td class="border px-8 py-4">50</td>
-                    <td class="border px-8 py-4">2025-04-04</td>
-                    <td class="border px-8 py-4 space-x-4">
-                        <a href="/inventory/edit/1" class="text-blue-600 hover:text-blue-800">Edit</a>
-                        <a href="/inventory/delete/1" class="text-red-600 hover:text-red-800">Delete</a>
-                    </td>
+                    <td class="border px-8 py-4">{{ i[0] }}</td>
+                    <td class="border px-8 py-4">{{ i[1] }} Bags</td>
+                    <td class="border px-8 py-4">{{ i[2] }}</td>
                 </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border px-8 py-4">A-</td>
-                    <td class="border px-8 py-4">30</td>
-                    <td class="border px-8 py-4">2025-04-03</td>
-                    <td class="border px-8 py-4 space-x-4">
-                        <a href="/inventory/edit/2" class="text-blue-600 hover:text-blue-800">Edit</a>
-                        <a href="/inventory/delete/2" class="text-red-600 hover:text-red-800">Delete</a>
-                    </td>
-                </tr>
+                {% endfor %}
+            
                 <!-- Add more inventory rows dynamically here -->
             </tbody>
         </table>

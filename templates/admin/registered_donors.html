@@ -33,7 +33,7 @@
     <div class="bg-white shadow-lg rounded-lg p-6 mb-4 border border-gray-200 overflow-y-auto" style="position: absolute; height:70%; width: 80%;">
         <div class="flex justify-between items-center mb-4">
             <div class="w-full md:w-1/2">
-                <input type="text" placeholder="Search Donors..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600" />
+                <input id="donorSearchInput" type="text" placeholder="Search Donors..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600" />
             </div>
             <button onclick="openAddDonorModal()" class="bg-red-600 text-white px-6 py-3 rounded-md shadow-md hover:bg-red-700">
                 Add Donor
@@ -41,9 +41,9 @@
         </div>
 
         <!-- Donors List Section -->
-        <div class="max-h-[500px] overflow-y-auto space-y-6">
+        <div id="donorList" class="max-h-[500px] overflow-y-auto space-y-6">
             {% for i in donors %}
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-md hover:bg-gray-100">
+            <div class="donor-item flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-md hover:bg-gray-100">
                 <div class="flex items-center space-x-6">
                     <img src="https://i.pinimg.com/736x/44/93/f3/4493f30f04ea1881d3df9956bf62f91a.jpg" class="w-16 h-16 rounded-full object-cover">
                     <div>
@@ -58,21 +58,23 @@
                 </div>
 
                 <div class="flex space-x-4 mt-4">
-                <button 
-                    class="text-blue-600 hover:text-blue-800"
-                    onclick='openEditDonorModal({
-                        id: "{{ i[0] }}",
-                        name: {{ i[1]|tojson }},
-                        age: "{{ i[2] }}",
-                        blood_type: "{{ i[3] }}",
-                        address: {{ i[4]|tojson }},
-                        contact: {{ i[5]|tojson }}
-                    })'
-                >
-                    Edit
-                </button>
+                    <!-- Edit Button -->
+                    <button 
+                        class="text-blue-600 hover:text-blue-800"
+                        onclick='openEditDonorModal({
+                            id: "{{ i[0] }}",
+                            name: {{ i[1]|tojson }},
+                            age: "{{ i[2] }}",
+                            blood_type: "{{ i[3] }}",
+                            address: {{ i[4]|tojson }},
+                            contact: {{ i[5]|tojson }}
+                        })'
+                    >
+                        Edit
+                    </button>
 
-                    <form action="{{ url_for('deletee.delete_donor', donor_id=i[0]) }}" method="POST" style="display:inline;">
+                    <!-- Delete Button -->
+                    <form action="{{ url_for('deletee.delete_donor', donor_id=i[0]) }}" method="POST" style="display:inline;"> 
                         <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
                     </form>
                 </div>
@@ -95,14 +97,14 @@
 
             <label for="donor-blood-type" class="block text-sm font-medium text-gray-700 mt-4">Blood Type</label>
             <select name="blood_type" required class="w-full p-2 border rounded-md">
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
+                <option value="1">A+</option>
+                <option value="2">A-</option>
+                <option value="3">B+</option>
+                <option value="4">B-</option>
+                <option value="5">AB+</option>
+                <option value="6">AB-</option>
+                <option value="7">O+</option>
+                <option value="8">O-</option>
             </select>
 
             <label for="donor-address" class="block text-sm font-medium text-gray-700 mt-4">Address</label>
@@ -155,14 +157,17 @@
 </div>
 
 <script>
+    // Open Add Donor Modal
     function openAddDonorModal() {
         document.getElementById('addDonorModal').classList.remove('hidden');
     }
 
+    // Close Add Donor Modal
     function closeAddDonorModal() {
         document.getElementById('addDonorModal').classList.add('hidden');
     }
 
+    // Open Edit Donor Modal
     function openEditDonorModal(donor) {
         document.getElementById('edit-donor-id').value = donor.id;
         document.getElementById('edit-donor-name').value = donor.name;
@@ -174,9 +179,62 @@
         document.getElementById('editDonorModal').classList.remove('hidden');
     }
 
+    // Close Edit Donor Modal
     function closeEditDonorModal() {
         document.getElementById('editDonorModal').classList.add('hidden');
     }
+
+    // Live search functionality
+    document.getElementById("donorSearchInput").addEventListener("input", function () {
+        const query = this.value.trim();
+        fetch(`/search_donor?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                const donorList = document.getElementById("donorList");
+                donorList.innerHTML = ""; // Clear the existing donor list
+                if (data.length === 0) {
+                    donorList.innerHTML = "<p class='text-center text-gray-500'>No donors found.</p>";
+                    return;
+                }
+                data.forEach(donor => {
+                    donorList.innerHTML += `
+                        <div class="donor-item flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-md hover:bg-gray-100">
+                            <div class="flex items-center space-x-6">
+                                <img src="https://i.pinimg.com/736x/44/93/f3/4493f30f04ea1881d3df9956bf62f91a.jpg" class="w-16 h-16 rounded-full object-cover">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800">${donor.donor_name}</h3>
+                                    <p class="text-sm text-gray-600">Age: ${donor.donor_age} | Blood Type: ${donor.blood_type}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex space-x-6">
+                                <p class="text-sm text-gray-600">Address: ${donor.address}</p>
+                                <p class="text-sm text-gray-600">Contact: ${donor.contact}</p>
+                            </div>
+
+                            <div class="flex space-x-4 mt-4">
+                                <button 
+                                    class="text-blue-600 hover:text-blue-800"
+                                    onclick='openEditDonorModal({
+                                        id: "${donor.donor_id}",
+                                        name: "${donor.donor_name}",
+                                        age: "${donor.donor_age}",
+                                        blood_type: "${donor.blood_type}",
+                                        address: "${donor.address}",
+                                        contact: "${donor.contact}"
+                                    })'>
+                                    Edit
+                                </button>
+
+                                <form action="/delete_donor/${donor.donor_id}" method="POST" style="display:inline;">
+                                    <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+    });
 </script>
 
 {% endblock %}

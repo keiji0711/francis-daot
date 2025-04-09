@@ -5,6 +5,7 @@ from routes.auth import bp as auth_bp
 from routes.deletee_routes import bp as deletee_bp
 from routes.adding_routes import bp as adding_bp
 from routes.update_routes import bp as update_bp
+from routes.searches import bp as search_bp
 
 app = Flask(__name__)
 
@@ -17,6 +18,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(deletee_bp)
 app.register_blueprint(adding_bp)
 app.register_blueprint(update_bp)
+app.register_blueprint(search_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)

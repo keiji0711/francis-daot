@@ -33,10 +33,8 @@
     <div class="bg-white p-8 rounded-lg shadow-lg">
         <div class="flex justify-between items-center mb-6">
             <div class="w-full md:w-1/2">
-                <!-- Search Bar -->
                 <input type="text" placeholder="Search Appointments..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600" />
             </div>
-            <!-- Add Appointment Button inside the card -->
             <button onclick="openModal()" class="bg-red-600 text-white px-6 py-3 rounded-md shadow-md hover:bg-red-700">
                 Add Appointment
             </button>
@@ -49,7 +47,8 @@
                     <th class="border px-8 py-4 text-left">Appointment Date</th>
                     <th class="border px-8 py-4 text-left">Blood Type</th>
                     <th class="border px-8 py-4 text-left">Location</th>
-                    <th class="border px-8 py-4 text-left">Purpose of Appointment</th>
+                    <th class="border px-8 py-4 text-left">Purpose</th>
+                    <th class="border px-8 py-4 text-left">Quantity</th>
                     <th class="border px-8 py-4 text-left">Actions</th>
                 </tr>
             </thead>
@@ -61,33 +60,34 @@
                     <td class="border px-8 py-4">{{ i[3] }}</td>
                     <td class="border px-8 py-4">{{ i[4] }}</td>
                     <td class="border px-8 py-4">{{ i[5] }}</td>
+                    <td class="border px-8 py-4">{{ i[6] }}</td>
                     <td class="border px-8 py-4 space-x-4">
-                        <button type="submit" class="text-blue-600 hover:text-blue-800">Edit</button>
+                        <button type="button" class="text-blue-600 hover:text-blue-800"
+                            onclick="openEditModal({{ i[0] }}, '{{ i[1] }}', '{{ i[2] }}', '{{ i[3] }}', '{{ i[4] }}', '{{ i[5] }}', '{{ i[6] }}')">Edit</button>
                         <form action="{{ url_for('deletee.delete_appointment', appointment_id=i[0]) }}" method="POST" style="display:inline;"> 
                             <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
                         </form>
                         <form action="{{ url_for('update.update_app_status', appointment_id=i[0]) }}" method="POST" style="display:inline;"> 
-                        <button type="submit" class="text-green-600 hover:text-green-800">Success</button>
+                            <button type="submit" class="text-green-600 hover:text-green-800">Success</button>
                         </form>
                     </td>
                 </tr>
                 {% endfor %}
-                <!-- Add more appointment rows dynamically here -->
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- Modal for Adding Appointment -->
+<!-- Add Appointment Modal -->
 <div id="appointmentModal" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center hidden">
     <div class="bg-white rounded-lg p-8 w-full max-w-lg">
         <div class="flex justify-between items-center">
             <h2 class="text-2xl font-bold text-red-600">Add Appointment</h2>
             <button onclick="closeModal()" class="text-gray-600 hover:text-red-600">&times;</button>
         </div>
-        <form class="mt-6" action="{{url_for('adding.add_appointment')}}" method="POST">
+        <form class="mt-6" action="{{ url_for('adding.add_appointment') }}" method="POST">
             <div class="mb-4">
-                <label for="donorName" class="block text-sm font-medium text-gray-700">Donor Name</label>
+                <label class="block text-sm font-medium text-gray-700">Donor Name</label>
                 <select name="donor_name" required class="w-full p-2 border rounded-md">
                     {% for donor in donors %}
                     <option value="{{ donor[0] }}">{{ donor[1] }}</option>
@@ -95,24 +95,21 @@
                 </select>
             </div>
             <div class="mb-4">
-                <label for="appointmentDate" class="block text-sm font-medium text-gray-700">Appointment Date</label>
-                <input type="datetime-local" name="appointmentDate" id="appointmentDate" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+                <label class="block text-sm font-medium text-gray-700">Appointment Date</label>
+                <input type="datetime-local" name="appointmentDate" class="mt-2 p-2 w-full border rounded-md" required>
+            </div>
+    
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Location</label>
+                <input type="text" name="location" class="mt-2 p-2 w-full border rounded-md" required>
             </div>
             <div class="mb-4">
-                <label for="donor-blood-type" class="block text-sm font-medium text-gray-700 mt-4">Blood Type</label>
-            <select name="blood_type" required class="w-full p-2 border rounded-md">
-                {% for i in blood_type %}
-                <option value="{{ i[0]}} ">{{ i[1] }}</option>
-                {% endfor %}
-            </select>
+                <label class="block text-sm font-medium text-gray-700">Purpose</label>
+                <input type="text" name="purpose" class="mt-2 p-2 w-full border rounded-md" required>
             </div>
             <div class="mb-4">
-                <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
-                <input type="text" name="location" id="location" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
-            </div>
-            <div class="mb-4">
-                <label for="purpose" class="block text-sm font-medium text-gray-700">Purpose of Appointment</label>
-                <input type="text" name="purpose" id="purpose" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required>
+                <label class="block text-sm font-medium text-gray-700">Quantity</label>
+                <input type="text" name="quantity" class="mt-2 p-2 w-full border rounded-md" required>
             </div>
             <div class="flex justify-end">
                 <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-md shadow-md hover:bg-red-700">Save</button>
@@ -121,16 +118,70 @@
     </div>
 </div>
 
+<!-- Edit Appointment Modal -->
+<div id="editAppointmentModal" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center hidden">
+    <div class="bg-white rounded-lg p-8 w-full max-w-lg">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-blue-600">Edit Appointment</h2>
+            <button onclick="closeEditModal()" class="text-gray-600 hover:text-red-600">&times;</button>
+        </div>
+        <form class="mt-6" action="#" method="POST">
+            <input type="hidden" name="appointment_id" id="edit_appointment_id">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Donor Name</label>
+                <input type="text" name="donor_name" id="edit_donor_name" class="mt-2 p-2 w-full border rounded-md" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Appointment Date</label>
+                <input type="datetime-local" name="appointmentDate" id="edit_appointment_date" class="mt-2 p-2 w-full border rounded-md" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Location</label>
+                <input type="text" name="location" id="edit_location" class="mt-2 p-2 w-full border rounded-md" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Purpose</label>
+                <input type="text" name="purpose" id="edit_purpose" class="mt-2 p-2 w-full border rounded-md" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Quantity</label>
+                <input type="text" name="quantity" id="edit_quantity" class="mt-2 p-2 w-full border rounded-md" required>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-700">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
-    // Open Modal
     function openModal() {
         document.getElementById('appointmentModal').classList.remove('hidden');
     }
 
-    // Close Modal
     function closeModal() {
         document.getElementById('appointmentModal').classList.add('hidden');
     }
-</script>
 
+    function openEditModal(id, donorName, date, bloodType, location, purpose, quantity) {
+        document.getElementById('editAppointmentModal').classList.remove('hidden');
+        document.getElementById('edit_appointment_id').value = id;
+        document.getElementById('edit_donor_name').value = donorName;
+        document.getElementById('edit_appointment_date').value = formatDateTimeForInput(date);
+        document.getElementById('edit_blood_type').value = bloodType;
+        document.getElementById('edit_location').value = location;
+        document.getElementById('edit_purpose').value = purpose;
+        document.getElementById('edit_quantity').value = quantity;
+    }
+
+    function closeEditModal() {
+        document.getElementById('editAppointmentModal').classList.add('hidden');
+    }
+
+    function formatDateTimeForInput(dateString) {
+        const dt = new Date(dateString);
+        return dt.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
+    }
+</script>
 {% endblock %}

@@ -58,7 +58,14 @@ def registered_donors():
 
 @bp.route('/inventory')
 def inventory():
-    return render_template('admin/inventory.html')
+    conn = mysql.connector.connect(**db)
+    cursor = conn.cursor()
+    cursor.execute("""SELECT type, SUM(quantity) AS total_quantity, date
+FROM inventory
+GROUP BY type""")
+    inventory = cursor.fetchall()
+    conn.close()
+    return render_template('admin/inventory.html', inventory = inventory)
 
 @bp.route('/appointments')
 def appointments():
@@ -71,7 +78,7 @@ def appointments():
     cursor.execute('select * from blood_type')
     blood_type = cursor.fetchall()
 
-    cursor.execute("""SELECT appointment.appointment_id, donors.donor_name,appointment.date, blood_type.blood_type_name,appointment.location,appointment.purpose ,appointment.status
+    cursor.execute("""SELECT appointment.appointment_id, donors.donor_name,appointment.date, blood_type.blood_type_name,appointment.location,appointment.purpose, appointment.quantity ,appointment.status
 FROM appointment,donors, blood_type WHERE appointment.donor_id = donors.donor_id AND appointment.blood_type_id = blood_type.blood_type_id and appointment.status = 'Active' """)
     appointments = cursor.fetchall()
     return render_template('admin/appointment.html', donors = donors, blood_type = blood_type, appointments = appointments)
@@ -149,6 +156,7 @@ def app_history():
     blood_type.blood_type_name, 
     appointment.location, 
     appointment.purpose,
+    appointment.quantity,               
     appointment.status
 FROM appointment
 JOIN donors ON appointment.donor_id = donors.donor_id
