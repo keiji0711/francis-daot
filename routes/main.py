@@ -1,5 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash,session
 import mysql.connector
+import hashlib
+
+
 
 bp = Blueprint('main', __name__, template_folder='templates/admin')
 
@@ -10,9 +13,48 @@ db = {
         'database':'blood_donation'
     }
 
+# SHA-256 password hashing function
+def hash_password_sha256(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
 @bp.route('/dashboard')
 def dashboard():
-    return render_template('admin/dashboard.html')
+    if 'user_id' not in session:
+        flash('You need to log in first', 'warning')
+        return redirect(url_for('auth.login'))
+    
+    conn = mysql.connector.connect(**db)
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM donors")
+    total_donors = cursor.fetchone()[0]
+
+    cursor.execute("SELECT SUM(quantity) AS total_quantity FROM inventory;")
+    total_quantity = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM appointment WHERE status = 'Active'")
+    total_appointments = cursor.fetchone()[0]
+
+    cursor.execute("SELECT * FROM donors ORDER BY created_at DESC")
+    recent_donors = cursor.fetchall()
+    recent = []
+    if not recent_donors:
+        recent = "No recent donors"
+    else:
+        recent = recent_donors[0]
+
+    cursor.execute("SELECT * FROM inventory ORDER BY date DESC")
+    inventory = cursor.fetchall()
+    recent_inv = []
+    
+    if not inventory:
+        recent_inv = "None"
+    else:
+        recent_inv = inventory[0]
+
+    username = session.get('username')
+    print(f"Username from session: {username}")  # Debugging print
+
+    return render_template('admin/dashboard.html', username=username, total_donors=total_donors,total_quantity=total_quantity,total_appointments = total_appointments,recent = recent, recent_inv = recent_inv) 
 
 @bp.route('/registered_donors', methods = ['GET', 'POST'])
 def registered_donors():
@@ -41,6 +83,7 @@ def registered_donors():
                 conn.close
 
     donors = []
+    total_donors = []
     try:
         conn = mysql.connector.connect(**db)
         cursor = conn.cursor()
@@ -48,13 +91,14 @@ def registered_donors():
                        donors.contact,donors.status FROM donors,blood_type
             WHERE donors.blood_type_id = blood_type.blood_type_id """)
         donors = cursor.fetchall()
+
     finally:
         if conn.is_connected():
             cursor.close()
             conn.close()
 
 
-    return render_template('admin/registered_donors.html', donors = donors)
+    return render_template('admin/registered_donors.html', donors = donors, total_donors = total_donors)
 
 @bp.route('/inventory')
 def inventory():
@@ -92,15 +136,16 @@ def blood_requests():
 def blood_req_transactions():
     return render_template('admin/blood_req_transaction.html')
 
-@bp.route('/account_management', methods = ['GET', 'POST'])
+@bp.route('/account_management', methods=['GET', 'POST'])
 def account_management():
-
     if request.method == 'POST':
         username = request.form['username']
         user_type = request.form.get('user_type')
-        print(user_type)
         password = request.form['password']
         confirm_password = request.form['confirm_password']
+
+        # Print user_type for debugging
+        print(user_type)
 
         try:
             conn = mysql.connector.connect(**db)
@@ -111,11 +156,15 @@ def account_management():
             existing_user = cursor.fetchone()
             if existing_user:
                 flash('Username already exists', 'danger')
-                return redirect(url_for('auth.register'))
+                return redirect(url_for('main.account_management'))
 
             if password == confirm_password:
+                # Hash the password with SHA-256
+                hashed_password = hash_password_sha256(password)
+                
+                # Insert the user with the hashed password
                 cursor.execute("INSERT INTO user (username, password, type_of_user_id) VALUES (%s, %s, %s)",
-                           (username, password, user_type))
+                               (username, hashed_password, user_type))
                 conn.commit()
                 flash('Account created successfully', 'success')
             else:
@@ -123,7 +172,7 @@ def account_management():
 
         except mysql.connector.Error as err:
             return f"Error: {err}"
-        
+
         finally:
             if conn.is_connected():
                 cursor.close()
@@ -134,7 +183,7 @@ def account_management():
     try:
         conn = mysql.connector.connect(**db)
         cursor = conn.cursor()
-        cursor.execute("""SELECT user.username, type_of_user.user_type, user.password, user.user_id FROM user,
+        cursor.execute("""SELECT user.user_id, user.username, type_of_user.user_type, user.password, user.user_id FROM user,
                        type_of_user WHERE user.type_of_user_id = type_of_user.type_of_user_id""")
         users = cursor.fetchall()
     finally:

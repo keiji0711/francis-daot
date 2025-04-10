@@ -78,6 +78,7 @@
                 <tr>
                     <th class="p-3">#</th>
                     <th class="p-3">Username</th>
+                    <th class="p-3">Password</th>
                     <th class="p-3">User Type</th>
                     <th class="p-3">Actions</th>
                 </tr>
@@ -87,10 +88,11 @@
                 <tr>
                     <td class="p-3">{{ user[0] }}</td>
                     <td class="p-3">{{ user[1] }}</td>
+                    <td class="p-3">••••••••</td>
                     <td class="p-3">{{ user[2] }}</td>
                     <td class="p-3">
-                        <a href="#" class="text-blue-600 hover:underline">Edit</a> |
-                        <form action="{{ url_for('deletee.delete_account' , account_id=user[3]) }}" method="POST" class="space-y-4">
+                        <button type="submit" class="text-blue-600 hover:text-blue-800">Edit</button>
+                        <form action="{{ url_for('deletee.delete_account' , account_id=user[0]) }}" method="POST" class="space-y-4">
                             <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
                         </form>
                     </td>
